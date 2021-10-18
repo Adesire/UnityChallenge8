@@ -94,11 +94,11 @@ public class AdManager : MonoBehaviour
     {
         if (_rewardBasedVideoAd != null)
         {
-            _rewardBasedVideoAd.Show(userEarnedRewardCallback);
+            _rewardBasedVideoAd.Show(UserEarnedRewardCallback);
         }
     }
 
-    private void userEarnedRewardCallback(Reward reward)
+    private void UserEarnedRewardCallback(Reward reward)
     {
         // TODO: Reward the user.
         _isRewarded = true;
