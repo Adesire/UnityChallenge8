@@ -13,6 +13,8 @@ public class AdManager : MonoBehaviour
     public static AdManager instance;
     private bool _isRewarded = false;
 
+    private RewardedAd _rewardedAd;
+
     private void Awake()
     {
         if (instance == null)
@@ -28,6 +30,9 @@ public class AdManager : MonoBehaviour
     {
         MobileAds.Initialize(status => { });
         this.RequestBanner();
+        _rewardedAd = new RewardedAd("ca-app-pub-3940256099942544/5224354917");
+        _rewardedAd.OnUserEarnedReward += this.HandleUserRewarded;
+        _rewardedAd.OnAdClosed += this.HandleRewardedAdClosed;
         RequestRewardAd();
     }
 
@@ -37,7 +42,9 @@ public class AdManager : MonoBehaviour
         if (_isRewarded)
         {
             _isRewarded = false;
+            Debug.Log("The user gets a reward");
             //Unlock Character
+            FindObjectOfType<CharacterSelection>().ChangeCharacter(4);
         }
     }
 
@@ -63,15 +70,6 @@ public class AdManager : MonoBehaviour
         this._interstitial.LoadAd(CreateAdRequest());
     }
 
-    private void RequestRewardAd()
-    {
-        string adUnitId = "ca-app-pub-3940256099942544/5354046379";
-        RewardedInterstitialAd.LoadAd(adUnitId, CreateAdRequest(),
-            (ad, args) => 
-                AdLoadCallback(ad, args.LoadAdError
-                .GetMessage()));
-    }
-
     public void ShowInterstitial()
     {
         if (this._interstitial.IsLoaded())
@@ -82,25 +80,26 @@ public class AdManager : MonoBehaviour
         }
     }
 
-    private void AdLoadCallback(RewardedInterstitialAd ad, string error)
+    private void RequestRewardAd()
     {
-        if (error == null)
+        _rewardedAd.LoadAd(CreateAdRequest());
+    }
+
+    public void ShowRewardedAd()
+    {
+        if (_rewardedAd.IsLoaded())
         {
-            _rewardBasedVideoAd = ad;
+            _rewardedAd.Show();
         }
     }
 
-    public void ShowRewardedInterstitialAd()
+    private void HandleRewardedAdClosed(object sender, EventArgs e)
     {
-        if (_rewardBasedVideoAd != null)
-        {
-            _rewardBasedVideoAd.Show(UserEarnedRewardCallback);
-        }
+        this.RequestRewardAd();
     }
 
-    private void UserEarnedRewardCallback(Reward reward)
+    private void HandleUserRewarded(object sender, Reward e)
     {
-        // TODO: Reward the user.
         _isRewarded = true;
     }
 }

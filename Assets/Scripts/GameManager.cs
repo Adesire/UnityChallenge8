@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
         AdManager.instance.RequestInterstitial();
         if (postProcessing.GetComponent<Volume>().profile.TryGet<ColorAdjustments>(out var adj))
         {
-            adj.hueShift.value = currentLevelIndex + 10;
+            adj.hueShift.value = (currentLevelIndex - 1) * 5;
         }
     }
 
